@@ -1,8 +1,13 @@
+# - name: grab test-secret from azure kv
+#   hosts: localhost
+#   tasks:
+#     - local_action:
+#         command ansible-galaxy role install azure.azure_preview_modules
+
 - name: grab test-secret from azure kv
   hosts: localhost
   gather_facts: false
-  roles: 
-    -  { role: azure.azure_preview_modules }
+  
   vars:
     kv_secret_name: "test"
   tasks:
@@ -14,8 +19,8 @@
         az_client_secret:  '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
         az_vault_url:      '{{ lookup("env", "AZ_VAULT_URL") }}'
 
-    - name: Set key vault secret fact
-      set_fact: secretValue={{ lookup('azure_keyvault_secret',kv_secret_name,vault_url=az_vault_url, client_id=az_client_id, secret=az_client_secret, tenant_id=az_tenant_id) }}
+    # - name: Set key vault secret fact
+    #   set_fact: secretValue={{ lookup('azure_keyvault_secret',kv_secret_name,vault_url=az_vault_url, client_id=az_client_id, secret=az_client_secret, tenant_id=az_tenant_id) }}
 
 
     # - name: Get secret from Azure Key Vault
@@ -27,6 +32,18 @@
     #     client_secret: "{{ lookup('env', 'AZ_CLIENT_SECRET') }}"
     #     tenant: "{{ lookup('env', 'AZ_TENANT_ID') }}"
     #   register: secret_output
+    - name: connect AZ CLI to Azure
+      shell: |
+        az login --service-principal -u "{{ az_client_id }}" -p "{{ az_client_secret }}" --tenant "{{ az_tenant_id }}"
+      args:
+        executable: /usr/bin/bash
+    - name: Retrieve secret and register as var
+      shell: az keyvault secret show --name "{{ kv_secret_name }}" --vault-name "{{ az_vault_name }}" --query value -o tsv
+      args:
+        executable: /usr/bin/bash
+      register: azure_secret
+    - debug:
+        msg: "{{ azure_secret.stdout }}"
     - name: Output key vault secret
       debug:
         msg: "{{ secretValue }}"
