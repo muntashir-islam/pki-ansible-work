@@ -1,25 +1,32 @@
 - name: grab test-secret from azure kv
   hosts: localhost
   gather_facts: false
-  collections:
-    - azure.azcollection
+  roles: 
+    -  { role: azure.azure_preview_modules }
   vars:
     kv_secret_name: "test"
   tasks:
     - name: set facts
       set_fact:
         az_vault_name: "kv-stage-medstack-pki"
+        az_tenant_id:   '{{ lookup("env", "AZ_TENANT_ID") }}'
+        az_client_id:   '{{ lookup("env", "AZ_CLIENT_ID") }}'
+        az_client_secret:  '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
+        az_vault_url:      '{{ lookup("env", "AZ_VAULT_URL") }}'
+
+    - name: Set key vault secret fact
+      set_fact: secretValue={{ lookup('azure_keyvault_secret',kv_secret_name,vault_url=az_vault_url, client_id=az_client_id, secret=az_client_secret, tenant_id=az_tenant_id) }}
 
 
-    - name: Get secret from Azure Key Vault
-      azure.azcollection.azure_rm_keyvaultsecret:
-        secret_name: "{{ kv_secret_name }}"
-        keyvault_uri: "{{ lookup('env', 'AZ_VAULT_URL') }}"
-        vault_uri: "{{ lookup('env', 'AZ_VAULT_URL') }}"
-        client_id: "{{ lookup('env', 'AZ_CLIENT_ID') }}"
-        client_secret: "{{ lookup('env', 'AZ_CLIENT_SECRET') }}"
-        tenant: "{{ lookup('env', 'AZ_TENANT_ID') }}"
-      register: secret_output
-    - name: Display the secret
+    # - name: Get secret from Azure Key Vault
+    #   azure.azcollection.azure_rm_keyvaultsecret:
+    #     secret_name: "{{ kv_secret_name }}"
+    #     keyvault_uri: "{{ lookup('env', 'AZ_VAULT_URL') }}"
+    #     vault_uri: "{{ lookup('env', 'AZ_VAULT_URL') }}"
+    #     client_id: "{{ lookup('env', 'AZ_CLIENT_ID') }}"
+    #     client_secret: "{{ lookup('env', 'AZ_CLIENT_SECRET') }}"
+    #     tenant: "{{ lookup('env', 'AZ_TENANT_ID') }}"
+    #   register: secret_output
+    - name: Output key vault secret
       debug:
-        msg: "{{ secret_output.secret }}"
+        msg: "{{ secretValue }}"
