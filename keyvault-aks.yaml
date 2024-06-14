@@ -1,22 +1,18 @@
 - name: grab test-secret from azure kv
   hosts: localhost
   gather_facts: false
-  connection: local
+  collections:
+    - azure.azcollection
   vars:
     kv_secret_name: "test"
   tasks:
     - name: set facts
       set_fact:
         az_vault_name: "kv-stage-medstack-pki"
-        # az_tenant_id:   '{{ lookup("env", "AZ_TENANT_ID") }}'
-        # az_client_id:   '{{ lookup("env", "AZ_CLIENT_ID") }}'
-        # az_client_secret:  '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
-        # az_vault_url:      '{{ lookup("env", "AZ_VAULT_URL") }}'
-    - name: Install azure.azcollection
-      ansible.builtin.pip:
-        name: azure.azcollection
+
+
     - name: Get secret from Azure Key Vault
-      azure.azcollection.azure_keyvault_secret:
+      azure.azcollection.azure_rm_keyvaultsecret:
         name: "{{ kv_secret_name }}"
         vault_uri: "{{ lookup('env', 'AZ_VAULT_URL') }}"
         client_id: "{{ lookup('env', 'AZ_CLIENT_ID') }}"
