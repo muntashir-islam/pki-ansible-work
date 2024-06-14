@@ -13,7 +13,8 @@
 
     - name: Get secret from Azure Key Vault
       azure.azcollection.azure_rm_keyvaultsecret:
-        name: "{{ kv_secret_name }}"
+        secret_name: "{{ kv_secret_name }}"
+        keyvault_uri: "{{ lookup('env', 'AZ_VAULT_URL') }}"
         vault_uri: "{{ lookup('env', 'AZ_VAULT_URL') }}"
         client_id: "{{ lookup('env', 'AZ_CLIENT_ID') }}"
         client_secret: "{{ lookup('env', 'AZ_CLIENT_SECRET') }}"
