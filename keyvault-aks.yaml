@@ -15,6 +15,13 @@
         az_client_id:   '{{ lookup("env", "AZ_CLIENT_ID") }}'
         az_client_secret:  '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
         az_vault_url:      '{{ lookup("env", "AZ_VAULT_URL") }}'
+    - name: Set Azure authentication facts
+      ansible.builtin.set_fact:
+        ansible_azure_auth:
+          client_id: '{{ lookup("env", "AZ_CLIENT_ID") }}'
+          secret: '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
+          tenant: '{{ lookup("env", "AZ_TENANT_ID") }}'
+          # subscription_id: "{{ azure_subscription_id }}"
     - name: Retrieve certificate from Azure Key Vault
       azure.azcollection.azure_rm_keyvaultsecret:
         secret_name: "{{ kv_secret_name }}"
