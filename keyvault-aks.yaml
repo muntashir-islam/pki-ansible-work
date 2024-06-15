@@ -19,7 +19,7 @@
         subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
         
   # Get CACertificate
-    - name: Get latest version of specific secret
+    - name: Get latest version of specific CACertificate for cluster
       azure_rm_keyvaultsecret_info:
         vault_uri: "https://{{ az_vault_name }}.vault.azure.net"
         client_id: '{{ az_client_id }}'
@@ -29,6 +29,15 @@
         name: test
       register: cacert_output
   #Get CAPrivateKey
+    - name: Get latest version of specific CAPrivateKey for Cluster
+      azure_rm_keyvaultsecret_info:
+        vault_uri: "https://{{ az_vault_name }}.vault.azure.net"
+        client_id: '{{ az_client_id }}'
+        secret: '{{ az_client_secret }}'
+        tenant: '{{ az_tenant_id }}'
+        subscription_id: '{{ subscription_id }}'
+        name: test
+      register: cakey_output
 
   #Create Directory
     - name: Create directory for certificates on remote
@@ -38,10 +47,17 @@
         mode: '0755'
 
   #write Certificate into a file
-    - name: Write the certificate to a file
+    - name: Write the CA certificate to a file
       ansible.builtin.copy:
-        content: "{{ secret_output.secrets[0].secret }}"
-        dest: "/tmp/ansible/certificate/ca_server_certificate.crt"
+        content: "{{ cacert_output.secrets[0].secret }}"
+        dest: "/tmp/ansible/certificate/CACertificate.pem"
+        mode: '0600'
+
+  #write CAPrivateKey into a file
+    - name: Write the CAPrivateKey to a file
+      ansible.builtin.copy:
+        content: "{{ cakey_output.secrets[0].secret }}"
+        dest: "/tmp/ansible/certificate/CAPrivateKey.pem"
         mode: '0600'
       
   # Test Step: To check whether secrets can be pulled properly 
