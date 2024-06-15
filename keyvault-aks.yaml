@@ -15,13 +15,13 @@
         az_client_id:   '{{ lookup("env", "AZ_CLIENT_ID") }}'
         az_client_secret:  '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
         az_vault_url:      '{{ lookup("env", "AZ_VAULT_URL") }}'
-    - name: Set Azure authentication facts
-      ansible.builtin.set_fact:
-        ansible_azure_auth:
-          client_id: '{{ lookup("env", "AZ_CLIENT_ID") }}'
-          secret: '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
-          tenant: '{{ lookup("env", "AZ_TENANT_ID") }}'
-          subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
+    # - name: Set Azure authentication facts
+    #   ansible.builtin.set_fact:
+    #     ansible_azure_auth:
+    #       client_id: '{{ lookup("env", "AZ_CLIENT_ID") }}'
+    #       secret: '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
+    #       tenant: '{{ lookup("env", "AZ_TENANT_ID") }}'
+    #       subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
     - name: Get latest version of specific secret
       azure_rm_keyvaultsecret_info:
         vault_uri: "https://{{ az_vault_name }}.vault.azure.net"
@@ -31,42 +31,12 @@
         subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
         name: test
       register: secret_output
+    - name: Write the certificate to a file
+      ansible.builtin.copy:
+        content: "{{ secret_output.secrets[0].secret }}"
+        dest: "/tmp/ansible/certificate/ca_server_certificate.crt"
+        mode: '0600'
     - name: Display the secret
       debug:
         msg: "{{ secret_output.secrets[0].secret }}"
-    # - name: Retrieve certificate from Azure Key Vault
-    #   azure.azcollection.azure_rm_keyvaultsecret:
-    #     secret_name: "test"
-    #     keyvault_uri: "https://{{ az_vault_name }}.vault.azure.net"
-    #     client_id: '{{ lookup("env", "AZ_CLIENT_ID") }}'
-    #     secret: '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
-    #     tenant: '{{ lookup("env", "AZ_TENANT_ID") }}'
-    #     subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
-    #     state: absent
-    #   register: secret_output
-    # - name: Debug secret output
-    #   debug:
-    #     var: secret_output
-    # - name: Display the secret
-    #   debug:
-    #     msg: "{{ secret.value }}"
-    # - name: Write the certificate to a file
-    #   ansible.builtin.copy:
-    #     content: "{{ secret.value }}"
-    #     dest: "/tmp/ansible/certificate/server_certificate.crt"
-    #     mode: '0600'
-
-    # # - name: Set key vault secret fact
-    # #   set_fact: secretValue={{ lookup('azure_keyvault_secret',kv_secret_name,vault_url=az_vault_url, client_id=az_client_id, secret=az_client_secret, tenant_id=az_tenant_id) }}
-
-
-    # # - name: Get secret from Azure Key Vault
-    # #   azure.azcollection.azure_rm_keyvaultsecret:
-    # #     secret_name: "{{ kv_secret_name }}"
-    # #     keyvault_uri: "{{ lookup('env', 'AZ_VAULT_URL') }}"
-    # #     vault_uri: "{{ lookup('env', 'AZ_VAULT_URL') }}"
-    # #     client_id: "{{ lookup('env', 'AZ_CLIENT_ID') }}"
-    # #     client_secret: "{{ lookup('env', 'AZ_CLIENT_SECRET') }}"
-    # #     tenant: "{{ lookup('env', 'AZ_TENANT_ID') }}"
-    # #   register: secret_output
     
