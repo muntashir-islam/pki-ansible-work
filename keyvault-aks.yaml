@@ -15,16 +15,12 @@
         az_client_id:   '{{ lookup("env", "AZ_CLIENT_ID") }}'
         az_client_secret:  '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
         az_vault_url:      '{{ lookup("env", "AZ_VAULT_URL") }}'
-    - name: Install Azure CLI
-      apt:
-        name: azure-cli
-        state: present
-    # - name: Retrieve certificate from Azure Key Vault
-    #   azure.azcollection.azure_rm_keyvaultsecret:
-    #     secret_name: "{{ kv_secret_name }}"
-    #     keyvault_uri: "https://{{ az_vault_name }}.vault.azure.net"
-    #     state: present
-    #   register: secret
+    - name: Retrieve certificate from Azure Key Vault
+      azure.azcollection.azure_rm_keyvaultsecret:
+        secret_name: "{{ kv_secret_name }}"
+        keyvault_uri: "https://{{ az_vault_name }}.vault.azure.net"
+        state: absent
+      register: secret
     # - name: Write the certificate to a file
     #   ansible.builtin.copy:
     #     content: "{{ secret.value }}"
