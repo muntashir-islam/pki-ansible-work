@@ -21,7 +21,7 @@
           client_id: '{{ lookup("env", "AZ_CLIENT_ID") }}'
           secret: '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
           tenant: '{{ lookup("env", "AZ_TENANT_ID") }}'
-          # subscription_id: "{{ azure_subscription_id }}"
+          subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
     - name: Retrieve certificate from Azure Key Vault
       azure.azcollection.azure_rm_keyvaultsecret:
         secret_name: "test"
@@ -29,6 +29,7 @@
         client_id: '{{ lookup("env", "AZ_CLIENT_ID") }}'
         secret: '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
         tenant: '{{ lookup("env", "AZ_TENANT_ID") }}'
+        subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
         state: absent
       register: secret
     - name: Display the secret
