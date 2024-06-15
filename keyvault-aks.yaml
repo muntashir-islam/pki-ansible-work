@@ -8,6 +8,7 @@
     kv_secret_name: "test"
 
   tasks:
+  #Set azure key vault access credential in AWX instance
     - name: set facts
       set_fact:
         az_vault_name: "kv-stage-medstack-pki"
@@ -15,32 +16,35 @@
         az_client_id:   '{{ lookup("env", "AZ_CLIENT_ID") }}'
         az_client_secret:  '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
         az_vault_url:      '{{ lookup("env", "AZ_VAULT_URL") }}'
-    # - name: Set Azure authentication facts
-    #   ansible.builtin.set_fact:
-    #     ansible_azure_auth:
-    #       client_id: '{{ lookup("env", "AZ_CLIENT_ID") }}'
-    #       secret: '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
-    #       tenant: '{{ lookup("env", "AZ_TENANT_ID") }}'
-    #       subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
+        subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
+        
+  # Get CACertificate
     - name: Get latest version of specific secret
       azure_rm_keyvaultsecret_info:
         vault_uri: "https://{{ az_vault_name }}.vault.azure.net"
-        client_id: '{{ lookup("env", "AZ_CLIENT_ID") }}'
-        secret: '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
-        tenant: '{{ lookup("env", "AZ_TENANT_ID") }}'
-        subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
+        client_id: '{{ az_client_id }}'
+        secret: '{{ az_client_secret }}'
+        tenant: '{{ az_tenant_id }}'
+        subscription_id: '{{ subscription_id }}'
         name: test
-      register: secret_output
+      register: cacert_output
+  #Get CAPrivateKey
+
+  #Create Directory
     - name: Create directory for certificates on remote
       file:
         path: "/tmp/ansible/certificate"
         state: directory
         mode: '0755'
+
+  #write Certificate into a file
     - name: Write the certificate to a file
       ansible.builtin.copy:
         content: "{{ secret_output.secrets[0].secret }}"
         dest: "/tmp/ansible/certificate/ca_server_certificate.crt"
         mode: '0600'
+      
+  # Test Step: To check whether secrets can be pulled properly 
     - name: Display the secret
       debug:
         msg: "{{ secret_output.secrets[0].secret }}"
