@@ -33,7 +33,7 @@
       register: secret_output
     - name: Display the secret
       debug:
-        msg: "{{ secret_output.secrets.secret }}"
+        msg: "{{ secret_output.secrets[0].secret }}"
     # - name: Retrieve certificate from Azure Key Vault
     #   azure.azcollection.azure_rm_keyvaultsecret:
     #     secret_name: "test"
