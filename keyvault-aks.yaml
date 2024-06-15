@@ -5,7 +5,8 @@
   collections:
     - azure.azcollection
   vars:
-    kv_secret_name: "test"
+    kv_cacertificate_name: "{{ cacertificate }}"
+    kv_caprivatekey_name: "{{ caprivatekey }}"
 
   tasks:
   #Set azure key vault access credential in AWX instance
@@ -26,7 +27,7 @@
         secret: '{{ az_client_secret }}'
         tenant: '{{ az_tenant_id }}'
         subscription_id: '{{ subscription_id }}'
-        name: test
+        name: kv_cacertificate_name
       register: cacert_output
   #Get CAPrivateKey
     - name: Get latest version of specific CAPrivateKey for Cluster
@@ -36,7 +37,7 @@
         secret: '{{ az_client_secret }}'
         tenant: '{{ az_tenant_id }}'
         subscription_id: '{{ subscription_id }}'
-        name: test
+        name: kv_caprivatekey_name
       register: cakey_output
 
   #Create Directory
