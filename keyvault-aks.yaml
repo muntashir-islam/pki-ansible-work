@@ -30,8 +30,11 @@
         secret: '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
         tenant: '{{ lookup("env", "AZ_TENANT_ID") }}'
         subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
-        state: absent
-      register: secret
+        state: present
+      register: secret_output
+    - name: Debug secret output
+      debug:
+        var: secret_output
     - name: Display the secret
       debug:
         msg: "{{ secret.value }}"
