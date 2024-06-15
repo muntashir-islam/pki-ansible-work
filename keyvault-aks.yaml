@@ -22,22 +22,30 @@
           secret: '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
           tenant: '{{ lookup("env", "AZ_TENANT_ID") }}'
           subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
-    - name: Retrieve certificate from Azure Key Vault
-      azure.azcollection.azure_rm_keyvaultsecret:
-        secret_name: "test"
-        keyvault_uri: "https://{{ az_vault_name }}.vault.azure.net"
+    - name: Get latest version of specific secret
+      azure_rm_keyvaultsecret_info:
+        vault_uri: "https://{{ az_vault_name }}.vault.azure.net"
         client_id: '{{ lookup("env", "AZ_CLIENT_ID") }}'
         secret: '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
         tenant: '{{ lookup("env", "AZ_TENANT_ID") }}'
         subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
-        state: absent
-      register: secret_output
-    - name: Debug secret output
-      debug:
-        var: secret_output
-    - name: Display the secret
-      debug:
-        msg: "{{ secret.value }}"
+        name: test
+    # - name: Retrieve certificate from Azure Key Vault
+    #   azure.azcollection.azure_rm_keyvaultsecret:
+    #     secret_name: "test"
+    #     keyvault_uri: "https://{{ az_vault_name }}.vault.azure.net"
+    #     client_id: '{{ lookup("env", "AZ_CLIENT_ID") }}'
+    #     secret: '{{ lookup("env", "AZ_CLIENT_SECRET") }}'
+    #     tenant: '{{ lookup("env", "AZ_TENANT_ID") }}'
+    #     subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
+    #     state: absent
+    #   register: secret_output
+    # - name: Debug secret output
+    #   debug:
+    #     var: secret_output
+    # - name: Display the secret
+    #   debug:
+    #     msg: "{{ secret.value }}"
     # - name: Write the certificate to a file
     #   ansible.builtin.copy:
     #     content: "{{ secret.value }}"
