@@ -31,6 +31,11 @@
         subscription_id: '{{ lookup("env", "AZ_SUBSCRIPTION_ID") }}'
         name: test
       register: secret_output
+    - name: Create directory for certificates on remote
+      file:
+        path: "/tmp/ansible/certificate"
+        state: directory
+        mode: '0755'
     - name: Write the certificate to a file
       ansible.builtin.copy:
         content: "{{ secret_output.secrets[0].secret }}"
