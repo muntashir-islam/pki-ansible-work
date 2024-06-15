@@ -27,7 +27,7 @@
         secret: '{{ az_client_secret }}'
         tenant: '{{ az_tenant_id }}'
         subscription_id: '{{ subscription_id }}'
-        name: kv_cacertificate_name
+        name: '{{ kv_cacertificate_name }}'
       register: cacert_output
   #Get CAPrivateKey
     - name: Get latest version of specific CAPrivateKey for Cluster
@@ -37,7 +37,7 @@
         secret: '{{ az_client_secret }}'
         tenant: '{{ az_tenant_id }}'
         subscription_id: '{{ subscription_id }}'
-        name: kv_caprivatekey_name
+        name: '{{ kv_caprivatekey_name }}'
       register: cakey_output
 
   #Create Directory
